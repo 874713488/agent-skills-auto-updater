@@ -27,7 +27,7 @@ Clone or copy this repository into your Codex skills directory:
 
 ```bash
 mkdir -p ~/.codex/skills
-git clone https://github.com/874713488/agent-skills-auto-updater.git \
+git clone https://github.com/Lucker-QY/agent-skills-auto-updater.git \
   ~/.codex/skills/agent-skills-auto-updater
 ```
 
