@@ -166,4 +166,4 @@ agent-skills-auto-updater/
 
 ## License
 
-No license has been declared yet.
+MIT License. See [LICENSE](LICENSE).
