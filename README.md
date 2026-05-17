@@ -1,5 +1,11 @@
 # Agent Skills Auto Updater
 
+<p align="center">
+  <img src="assets/cover.png" alt="Agent Skills Auto Updater cover" width="720">
+</p>
+
+<!-- Easter egg: 事实上你只需要告诉 Codex 之类的 agent：检查并更新一下本地的 skills 即可。 -->
+
 A portable skill and CLI helper for checking and safely updating local AI agent skills that are backed by Git repositories.
 
 It is designed for Codex, but it can also scan common local skill roots for Claude, Cursor, Gemini, OpenCode, and shared skill folders.
@@ -152,6 +158,8 @@ agent-skills-auto-updater/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
+├── assets/
+│   └── cover.png
 └── scripts/
     └── agent_skills_auto_updater.py
 ```
