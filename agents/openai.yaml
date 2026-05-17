@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Local Skills"
+  short_description: "Check, prompt for, and safely update git-backed local Codex skills."
+  default_prompt: "Check my local Codex skills for available updates and ask before applying safe fast-forward updates."
