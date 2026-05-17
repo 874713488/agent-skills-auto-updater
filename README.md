@@ -33,6 +33,22 @@ git clone https://github.com/Lucker-QY/agent-skills-auto-updater.git \
 
 Restart Codex so it can discover the new skill.
 
+### Optional: prepare a Codex automation
+
+Codex skills do not have install-time hooks, so cloning this repository cannot silently register an automation. The bundled installer helper prepares the automation request and enables this skill's local prompt mode:
+
+```bash
+python3 ~/.codex/skills/agent-skills-auto-updater/scripts/install_codex_automation.py --print
+```
+
+It writes:
+
+```text
+~/.config/agent-skills-auto-updater/codex_automation_request.md
+```
+
+Open that request in Codex and ask Codex to create or update the automation with its built-in automation tool. The default request schedules a recurring check of local Git-backed skills and asks before applying safe fast-forward updates.
+
 ## CLI usage
 
 Check for updates without changing files:
@@ -161,6 +177,7 @@ agent-skills-auto-updater/
 ├── assets/
 │   └── cover.png
 └── scripts/
+    ├── install_codex_automation.py
     └── agent_skills_auto_updater.py
 ```
 
