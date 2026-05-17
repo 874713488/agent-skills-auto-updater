@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check and safely update local Git-backed Codex skills."""
+"""Check and safely update local Git-backed AI agent skills."""
 
 from __future__ import annotations
 
@@ -26,7 +26,8 @@ class RepoResult:
 
 
 def config_path() -> Path:
-    return codex_home() / "update-local-skills.json"
+    base = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")).expanduser()
+    return base / "agent-skills-auto-updater" / "config.json"
 
 
 def load_config() -> dict:
@@ -70,12 +71,36 @@ def codex_home() -> Path:
     return Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")).expanduser()
 
 
-def default_roots(include_plugin_cache: bool) -> List[Path]:
+def known_roots(agent: str, include_plugin_cache: bool) -> List[Path]:
     home = codex_home()
-    roots = [home / "skills"]
-    if include_plugin_cache:
-        roots.append(home / "plugins" / "cache")
-    return roots
+    user_home = Path.home()
+    candidates = {
+        "codex": [home / "skills"],
+        "claude": [user_home / ".claude" / "skills"],
+        "cursor": [user_home / ".cursor" / "skills", user_home / ".cursor" / "skills-cursor"],
+        "gemini": [user_home / ".gemini" / "skills"],
+        "opencode": [user_home / ".config" / "opencode" / "skills"],
+        "shared": [user_home / "ai-skills"],
+    }
+
+    selected: List[Path] = []
+    if agent == "all":
+        for roots in candidates.values():
+            selected.extend(roots)
+    else:
+        selected.extend(candidates.get(agent, []))
+
+    if include_plugin_cache and agent in ("codex", "all"):
+        selected.append(home / "plugins" / "cache")
+
+    unique: List[Path] = []
+    seen = set()
+    for root in selected:
+        key = str(root.expanduser())
+        if key not in seen:
+            unique.append(root)
+            seen.add(key)
+    return unique
 
 
 def is_within(child: Path, parent: Path) -> bool:
@@ -319,7 +344,7 @@ def print_table(results: List[RepoResult]) -> None:
 
 
 def run_update(args: argparse.Namespace) -> int:
-    roots = args.root if args.root else default_roots(args.include_plugin_cache)
+    roots = args.root if args.root else known_roots(args.agent, args.include_plugin_cache)
     repos = discover_repos(roots, args.include_system)
     results = [process_repo(repo, apply=args.apply, timeout=args.timeout) for repo in repos]
 
@@ -370,7 +395,7 @@ def run_prompt(args: argparse.Namespace) -> int:
 
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Check and safely update local Git-backed Codex skills."
+        description="Check and safely update local Git-backed AI agent skills."
     )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true", help="check only; do not update")
@@ -396,6 +421,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         help="show whether prompt mode is enabled",
     )
     parser.add_argument(
+        "--agent",
+        choices=["all", "codex", "claude", "cursor", "gemini", "opencode", "shared"],
+        default="all",
+        help="known local skill roots to scan when --root is not provided",
+    )
+    parser.add_argument(
         "--root",
         action="append",
         type=Path,
@@ -411,6 +442,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         action="store_true",
         help="also scan the Codex plugin cache",
     )
+    parser.add_argument("--list-roots", action="store_true", help="list selected roots and exit")
     parser.add_argument("--json", action="store_true", help="emit JSON")
     parser.add_argument("--timeout", type=int, default=60, help="per-git-command timeout in seconds")
     args = parser.parse_args(argv)
@@ -428,6 +460,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.auto_prompt_status:
         state = "enabled" if load_config().get("auto_prompt", False) else "disabled"
         print(f"Auto prompt is {state}. Config: {config_path()}")
+        return 0
+
+    if args.list_roots:
+        roots = args.root if args.root else known_roots(args.agent, args.include_plugin_cache)
+        for root in roots:
+            marker = "exists" if root.expanduser().exists() else "missing"
+            print(f"{root.expanduser()} ({marker})")
         return 0
 
     if args.prompt:

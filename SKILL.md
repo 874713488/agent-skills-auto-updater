@@ -1,22 +1,22 @@
 ---
-name: update-local-skills
-description: Check and update locally installed Codex skills that are backed by Git repositories. Use when the user asks to update skills, sync local skills with GitHub, check whether installed skills are outdated, audit local skill versions, or create/run an automation that keeps ~/.codex/skills current.
+name: agent-skills-auto-updater
+description: Check, prompt for, and safely update all locally installed Git-backed AI agent skills across Codex and other skill roots. Use when the user asks to update local skills, sync skills with GitHub, check whether installed skills are outdated, audit local skill versions, or create/run an automation that keeps local agent skills current.
 ---
 
-# Update Local Skills
+# Agent Skills Auto Updater
 
 ## Workflow
 
 1. Locate this skill folder and run the bundled updater:
 
 ```bash
-python3 /path/to/update-local-skills/scripts/update_local_skills.py --apply
+python3 /path/to/agent-skills-auto-updater/scripts/agent_skills_auto_updater.py --apply
 ```
 
 2. If the user only asks for a status check, use:
 
 ```bash
-python3 /path/to/update-local-skills/scripts/update_local_skills.py --check
+python3 /path/to/agent-skills-auto-updater/scripts/agent_skills_auto_updater.py --check
 ```
 
 3. Report the summary table: updated, already current, skipped, and failed repositories.
@@ -26,16 +26,16 @@ python3 /path/to/update-local-skills/scripts/update_local_skills.py --check
 If the user asks for an "automatic update prompt" or wants to decide each time, use the script's prompt controls:
 
 ```bash
-python3 /path/to/update-local-skills/scripts/update_local_skills.py --enable-auto-prompt
-python3 /path/to/update-local-skills/scripts/update_local_skills.py --prompt
-python3 /path/to/update-local-skills/scripts/update_local_skills.py --disable-auto-prompt
+python3 /path/to/agent-skills-auto-updater/scripts/agent_skills_auto_updater.py --enable-auto-prompt
+python3 /path/to/agent-skills-auto-updater/scripts/agent_skills_auto_updater.py --prompt
+python3 /path/to/agent-skills-auto-updater/scripts/agent_skills_auto_updater.py --disable-auto-prompt
 ```
 
 When prompt mode is enabled, ask the user in chat before applying updates. Offer four choices: update now, check only, skip this time, or disable future prompts. If the user disables future prompts, run `--disable-auto-prompt`.
 
 ## Defaults
 
-- Scan `${CODEX_HOME:-~/.codex}/skills`.
+- Scan known local agent skill roots that exist, including Codex, Claude, Cursor, Gemini, OpenCode, and `~/ai-skills`.
 - Skip `.system` skills unless the user explicitly asks to include system skills.
 - Skip plugin cache skills unless the user explicitly asks to include plugin-managed skills.
 - Update only Git-backed skill directories.
@@ -44,9 +44,11 @@ When prompt mode is enabled, ask the user in chat before applying updates. Offer
 
 ## Options
 
+- Add `--agent codex`, `--agent claude`, `--agent cursor`, `--agent gemini`, `--agent opencode`, or `--agent all` to choose known roots.
 - Add `--root <path>` to scan a specific skills directory.
 - Add `--include-system` to include `.system` under the selected skills root.
 - Add `--include-plugin-cache` to also scan `${CODEX_HOME:-~/.codex}/plugins/cache`.
+- Add `--list-roots` to show which roots would be scanned.
 - Add `--json` when machine-readable output is useful.
 
 ## Startup Automation

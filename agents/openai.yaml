@@ -1,4 +1,4 @@
 interface:
-  display_name: "Update Local Skills"
-  short_description: "Check, prompt for, and safely update git-backed local Codex skills."
-  default_prompt: "Check my local Codex skills for available updates and ask before applying safe fast-forward updates."
+  display_name: "Agent Skills Auto Updater"
+  short_description: "Check, prompt for, and safely update all git-backed local agent skills."
+  default_prompt: "Check my local agent skills for available updates and ask before applying safe fast-forward updates."
